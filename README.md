@@ -4,7 +4,7 @@
 This project demonstrates a fully automated, event-driven data engineering pipeline designed to process customer support data for a fictitious company, "Careplus". The pipeline ingests transactional support tickets and semi-structured system logs, transforms the data using serverless AWS services, and serves it through a robust data warehouse for business intelligence and ad-hoc analytics. 
 
 Thank you to Codebasics.
-![Project Plan](images/architecture.png)
+* ![Project Plan](arch.png)
 
 *(Note: Due to confidentiality and proprietary constraints, the underlying source code, ingestion scripts, and DDL statements are not published in this repository.)*
 
@@ -16,14 +16,13 @@ Thank you to Codebasics.
 * **Ad-hoc Analytics:** Amazon Athena
 * **Data Warehouse:** Amazon Redshift
 * **Data Visualization:** Power BI
-![Project Plan](images/architecture.png)
 
 ## 🗄️ Data Sources
 The pipeline integrates two primary data streams:
 1. **Support Tickets (MySQL):** Transactional data exported as `.csv` containing ticket details such as `ticket_id`, `created_at`, `resolved_at`, `agent`, `priority`, `num_interactions`, `IssUeCat`, `channel`, and `status`.
-2. **Support Logs (Text/Log Files):** Server logging data capturing system health and user sessions. Key attributes extracted include timestamps, log levels (INFO, DEBUG), `TicketID`, `SessionID`, `IP` address, `ResponseTime`, `CPU` utilization, and `UserAgent` strings.
-
-![Project Plan](images/architecture.png)
+   ![OLTP_DATA - support tickets](sql_.png)
+3. **Support Logs (Text/Log Files):** Server logging data capturing system health and user sessions. Key attributes extracted include timestamps, log levels (INFO, DEBUG), `TicketID`, `SessionID`, `IP` address, `ResponseTime`, `CPU` utilization, and `UserAgent` strings.
+   ![OLTP_DATA - support logs](log_.png)
 
 ## ⚙️ Pipeline Workflow
 
@@ -37,6 +36,7 @@ The transformation layer is entirely automated. As soon as a file lands in S3, a
 * **Ticket Data Processing:** An AWS Lambda function cleans and transforms the `.csv` ticket data, converting it into a highly optimized, BI-ready `.parquet` format.
 * **Log Data Processing:** AWS Glue handles the transformations to parse key-value metrics from the text, structure the data, and output it as `.parquet` files.
 * Both processed datasets are subsequently saved into the **processed folder** of the S3 bucket.
+  ![event_driven](event_driven.png)
 
 ### 3. Storage & Analytics
 * **Ad-Hoc Querying:** Amazon Athena is used for adhoc analysis against the `.parquet` files.
@@ -45,4 +45,6 @@ The transformation layer is entirely automated. As soon as a file lands in S3, a
 ### 4. Data Visualization
 Amazon Redshift is connected to a **Power BI** dashboard. The dashboards provide critical business metrics:
 * **Ticket Insights:** Tracks total tickets, resolution rates, average interactions, and average resolution minutes broken down by priority, agent, and issue category.
+  ![event_driven](support_tickets_viz.png)
 * **Log Analytics:** Monitors system health, displaying average CPU usage, total logs by user agent, and log levels to correlate system performance.
+  ![event_driven](support_logs_viz.png)
